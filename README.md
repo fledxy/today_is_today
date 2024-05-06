@@ -6,6 +6,6 @@ Using Bloc to Fetch Api from website (https://openweathermap.org/).
 
 And u know What time is it? It's GAM TIMEEEEEEEE
 
-# todayistoday
+# today is today
 
 
