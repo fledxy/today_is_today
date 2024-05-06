@@ -16,61 +16,30 @@ class _HomePageScreenState extends State<HomePageScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: const Color.fromARGB(255, 11, 86, 93),
       body: Container(
         padding: const EdgeInsets.fromLTRB(40, 1.2 * kToolbarHeight, 40, 20),
         child: SizedBox(
           height: MediaQuery.of(context).size.height,
-          child: Stack(children: [
-            Background(),
+          child: const Column(children: [
             WeatherTitle(),
+            Spacer(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                ListWeather(
+                    time: '2:00 AM', temperature: '10°', image: 'assets/1.png'),
+                ListWeather(
+                    time: '12:00 AM', temperature: '9°', image: 'assets/2.png'),
+                ListWeather(
+                    time: '18:00 PM', temperature: '11°', image: 'assets/3.png')
+              ],
+            ),
+            Spacer(),
+            Spacer()
           ]),
         ),
       ),
-    );
-  }
-}
-
-class Background extends StatelessWidget {
-  const Background({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Align(
-          alignment: AlignmentDirectional(10, -0.3),
-          child: Container(
-            height: 300,
-            width: 300,
-            decoration:
-                BoxDecoration(shape: BoxShape.circle, color: Colors.deepPurple),
-          ),
-        ),
-        Align(
-          alignment: AlignmentDirectional(-10, -0.3),
-          child: Container(
-            height: 300,
-            width: 300,
-            decoration:
-                BoxDecoration(shape: BoxShape.circle, color: Colors.deepPurple),
-          ),
-        ),
-        Align(
-          alignment: AlignmentDirectional(0, -1.3),
-          child: Container(
-            height: 300,
-            width: 600,
-            decoration:
-                BoxDecoration(shape: BoxShape.rectangle, color: Colors.orange),
-          ),
-        ),
-        BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100),
-          child:
-              Container(decoration: BoxDecoration(color: Colors.transparent)),
-        ),
-      ],
     );
   }
 }
@@ -85,36 +54,27 @@ class WeatherTitle extends StatelessWidget {
         if (state is WeatherSuccess) {
           return Container(
               width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
+              // height: MediaQuery.of(context).size.height,
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       '${state.weather.areaName}',
-                      style: TextStyle(color: Colors.white, fontSize: 15),
+                      style: const TextStyle(color: Colors.white, fontSize: 15),
                     ),
                     Text(
                       greeting(),
-                      style: TextStyle(
+                      style: const TextStyle(
                           color: Colors.white,
                           fontSize: 30,
                           fontWeight: FontWeight.w600),
                     ),
-                    SizedBox(height: 50),
-                    getWeatherIcon(state.weather.weatherConditionCode!),
-                    SizedBox(height: 50),
+                    const SizedBox(height: 50),
                     Center(
                         child: Column(children: [
                       Text(
-                        '${state.weather.temperature!.celsius!.round()}°C',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 50,
-                            fontWeight: FontWeight.w700),
-                      ),
-                      Text(
                         '${state.weather.weatherMain}',
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 30,
                           fontWeight: FontWeight.w500,
@@ -122,11 +82,42 @@ class WeatherTitle extends StatelessWidget {
                       ),
                       Text(
                           '${DateFormat('EEE dd · hh.mma').format(state.weather.date ?? DateTime.now())}',
-                          style: TextStyle(color: Colors.grey, fontSize: 14))
-                    ]))
+                          style:
+                              const TextStyle(color: Colors.grey, fontSize: 14))
+                    ])),
+                    const SizedBox(height: 10),
+                    Container(
+                        height: 200,
+                        child: Stack(children: [
+                          Align(
+                              alignment: const AlignmentDirectional(0, -2.8),
+                              child: ShaderMask(
+                                shaderCallback: (Rect rect) {
+                                  return const LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [Colors.transparent, Colors.white],
+                                    stops: [0.2, 1.2],
+                                  ).createShader(rect);
+                                },
+                                blendMode: BlendMode.dstOut,
+                                child: Text(
+                                  '${state.weather.temperature!.celsius!.round()}°',
+                                  overflow: TextOverflow.fade,
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 120,
+                                      fontWeight: FontWeight.w700),
+                                ),
+                              )),
+                          Align(
+                              alignment: const AlignmentDirectional(0, 2),
+                              child: getWeatherIcon(
+                                  state.weather.weatherConditionCode!))
+                        ]))
                   ]));
         } else {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         }
       },
     );
@@ -155,5 +146,29 @@ Widget getWeatherIcon(int icon) {
         'assets/3.png',
         fit: BoxFit.fill,
       );
+  }
+}
+
+class ListWeather extends StatelessWidget {
+  final String image;
+  final String time;
+  final String temperature;
+  const ListWeather(
+      {super.key,
+      required this.time,
+      required this.temperature,
+      required this.image});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: [
+      Container(height: 50, child: Image.asset(image)),
+      Text(time,
+          style: const TextStyle(
+              color: Colors.grey, fontSize: 14, fontWeight: FontWeight.w500)),
+      Text(temperature,
+          style: const TextStyle(
+              color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700))
+    ]);
   }
 }
